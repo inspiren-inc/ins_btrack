@@ -14,7 +14,7 @@ def get_extensions():
 
     sources = [main_source] + sources
 
-    extra_compile_args = ["-O3"]
+    extra_compile_args = ["-O3", "-std=c++11"]
     include_dirs = [extensions_dir, pybind11.get_include()]  # Add Pybind11 include directory
 
     ext_modules = [
