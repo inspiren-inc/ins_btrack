@@ -1,0 +1,27 @@
+conda create --name btrack_exp python=3.8
+conda activate btrack_exp
+
+cd $BASE_STATION_ROOT$
+pip3 install -r requirements.txt
+pip3 uninstall numpy opencv-python
+conda install numpy=1.19.5 opencv=4.6
+conda install pybind11 loguru pandas seaborn scipy
+
+cd ~
+mkdir 3rd_party
+cd 3rd_party
+
+git clone https://github.com/gatagat/lap
+cd lap
+python3 setup.py build
+python3 setup.py install
+
+cd ..
+git clone https://github.com/samson-wang/cython_bbox.git
+cd cython_bbox
+python3 setup.py build
+
+cd..
+git clone git@github.com:inspiren-inc/ins_btrack.git -b ins-btrack
+cd ins_btrack
+python3 setup.py develop
