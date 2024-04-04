@@ -151,7 +151,8 @@ class BYTETracker(object):
         self.frame_id = 0
         self.args = args
         self.init_new_track_thresh = args["track_threshold"]# + 0.1
-        self.buffer_size = int(frame_rate / 30.0 * args["track_buffer"])
+        #self.buffer_size = int(frame_rate / 30.0 * args["track_buffer"])
+        self.buffer_size = args["track_buffer"]
         self.max_time_lost = self.buffer_size
         self.kalman_filter = KalmanFilter()
 
@@ -249,7 +250,7 @@ class BYTETracker(object):
         
         dists = matching.fuse_score(dists, detections)
         
-        matches, u_unconfirmed, u_detection = matching.linear_assignment(dists, thresh=0.7)
+        matches, u_unconfirmed, u_detection = matching.linear_assignment(dists, thresh=0.3)
         for itracked, idet in matches:
             unconfirmed[itracked].update(detections[idet], self.frame_id)
             activated_starcks.append(unconfirmed[itracked])
