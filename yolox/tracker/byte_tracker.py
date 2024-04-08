@@ -150,7 +150,8 @@ class BYTETracker(object):
 
         self.frame_id = 0
         self.args = args
-        self.init_new_track_thresh = args["track_threshold"]# + 0.1
+        self.high_score_cutoff = args["high_score_cutoff"]
+        self.low_score_cutoff = args["low_score_cutoff"]
         #self.buffer_size = int(frame_rate / 30.0 * args["track_buffer"])
         self.buffer_size = args["track_buffer"]
         self.max_time_lost = self.buffer_size
@@ -171,9 +172,9 @@ class BYTETracker(object):
         people = output_results[:, 5]
         bboxes = output_results[:, :4]
 
-        remain_inds = scores > self.args["track_threshold"]
-        inds_low = scores > 0.1
-        inds_high = scores < self.args["track_threshold"]
+        remain_inds = scores > self.args["high_score_cutoff"]
+        inds_low = scores > self.low_score_cutoff
+        inds_high = scores < self.args["high_score_cutoff"]
 
         inds_second = np.logical_and(inds_low, inds_high)
         dets_second = bboxes[inds_second]
@@ -227,7 +228,7 @@ class BYTETracker(object):
             detections_second = []
         r_tracked_stracks = [strack_pool[i] for i in u_track if strack_pool[i].state == TrackState.Tracked]
         dists = matching.iou_distance(r_tracked_stracks, detections_second)
-        matches, u_track, u_detection_second = matching.linear_assignment(dists, thresh=0.5)
+        matches, u_track, u_detection_second = matching.linear_assignment(dists, thresh=0.2)
         for itracked, idet in matches:
             track = r_tracked_stracks[itracked]
             det = detections_second[idet]
@@ -262,7 +263,7 @@ class BYTETracker(object):
         """ Step 4: Init new stracks"""
         for inew in u_detection:
             track = detections[inew]
-            if track.score < self.init_new_track_thresh:
+            if track.score < self.high_score_cutoff:
                 continue
             track.activate(self.kalman_filter, self.frame_id)
             activated_starcks.append(track)
