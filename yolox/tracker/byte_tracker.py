@@ -10,7 +10,7 @@ from .basetrack import BaseTrack, TrackState
 
 class STrack(BaseTrack):
     shared_kalman = KalmanFilter()
-    def __init__(self, tlwh, score, person):
+    def __init__(self, tlwh, score, prediction_idx):
 
         # wait activate
         self._tlwh = np.asarray(tlwh, dtype=float)
@@ -21,7 +21,7 @@ class STrack(BaseTrack):
         self.score = score
         self.tracklet_len = 0
         
-        self.person_instance = person
+        self.prediction_idx = prediction_idx
 
     def predict(self):
         mean_state = self.mean.copy()
@@ -166,11 +166,11 @@ class BYTETracker(object):
         newly_created_stracks = []
         
         if output_results.size == 0:
-            return [], [], []
-
-        scores = output_results[:, 4]
-        people = output_results[:, 5]
-        bboxes = output_results[:, :4]
+            scores = np.array([]) 
+            bboxes = np.array([])
+        else:
+            scores = output_results[:, 4]
+            bboxes = output_results[:, :4]
 
         remain_inds = scores > self.args["high_score_cutoff"]
         inds_low = scores > self.low_score_cutoff
@@ -184,8 +184,8 @@ class BYTETracker(object):
 
         if len(dets) > 0:
             '''Detections'''
-            detections = [STrack(STrack.tlbr_to_tlwh(tlbr), s, person) for
-                          (tlbr, s, person) in zip(dets, scores_keep, people)]
+            detections = [STrack(STrack.tlbr_to_tlwh(tlbr), s, idx) for
+                          idx, (tlbr, s) in enumerate(zip(dets, scores_keep))]
         else:
             detections = []
 
