@@ -66,6 +66,7 @@ class STrack(BaseTrack):
         self.frame_id = frame_id
         if new_id:
             self.track_id = self.next_id()
+        self.prediction_idx = new_track.prediction_idx
         self.score = new_track.score
 
     def update(self, new_track, frame_id):
@@ -85,6 +86,7 @@ class STrack(BaseTrack):
         self.state = TrackState.Tracked
         self.is_activated = True
 
+        self.prediction_idx = new_track.prediction_idx
         self.score = new_track.score
 
     @property
@@ -222,8 +224,8 @@ class BYTETracker(object):
         # association the untrack to the low score detections
         if len(dets_second) > 0:
             '''Detections'''
-            detections_second = [STrack(STrack.tlbr_to_tlwh(tlbr), s, person) for
-                          (tlbr, s, person) in zip(dets_second, scores_second, people)]
+            detections_second = [STrack(STrack.tlbr_to_tlwh(tlbr), s, idx) for
+                          idx, (tlbr, s) in enumerate(zip(dets_second, scores_second, people))]
         else:
             detections_second = []
         r_tracked_stracks = [strack_pool[i] for i in u_track if strack_pool[i].state == TrackState.Tracked]
