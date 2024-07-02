@@ -225,7 +225,7 @@ class BYTETracker(object):
         if len(dets_second) > 0:
             '''Detections'''
             detections_second = [STrack(STrack.tlbr_to_tlwh(tlbr), s, idx) for
-                          idx, (tlbr, s) in enumerate(zip(dets_second, scores_second, people))]
+                          idx, (tlbr, s) in enumerate(zip(dets_second, scores_second))]
         else:
             detections_second = []
         r_tracked_stracks = [strack_pool[i] for i in u_track if strack_pool[i].state == TrackState.Tracked]
