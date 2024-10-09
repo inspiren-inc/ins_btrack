@@ -180,14 +180,16 @@ class BYTETracker(object):
 
         inds_second = np.logical_and(inds_low, inds_high)
         dets_second = bboxes[inds_second]
+        dets_second_indices = np.where(inds_second)[0]
         dets = bboxes[remain_inds]
+        dets_keep_indices = np.where(remain_inds)[0]
         scores_keep = scores[remain_inds]
         scores_second = scores[inds_second]
 
         if len(dets) > 0:
             '''Detections'''
             detections = [STrack(STrack.tlbr_to_tlwh(tlbr), s, idx) for
-                          idx, (tlbr, s) in enumerate(zip(dets, scores_keep))]
+                          idx, tlbr, s in zip(dets_keep_indices, dets, scores_keep)]
         else:
             detections = []
 
@@ -225,7 +227,7 @@ class BYTETracker(object):
         if len(dets_second) > 0:
             '''Detections'''
             detections_second = [STrack(STrack.tlbr_to_tlwh(tlbr), s, idx) for
-                          idx, (tlbr, s) in enumerate(zip(dets_second, scores_second))]
+                           idx, tlbr, s in zip(dets_second_indices, dets_second, scores_second)]
         else:
             detections_second = []
         r_tracked_stracks = [strack_pool[i] for i in u_track if strack_pool[i].state == TrackState.Tracked]
