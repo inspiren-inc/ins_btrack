@@ -37,7 +37,7 @@ class KalmanFilter(object):
 
     """
 
-    def __init__(self):
+    def __init__(self, std_weight_position = 1. / 20, std_weight_velocity = 1. / 160):
         ndim, dt = 4, 1.
 
         # Create Kalman filter model matrices.
@@ -48,9 +48,11 @@ class KalmanFilter(object):
 
         # Motion and observation uncertainty are chosen relative to the current
         # state estimate. These weights control the amount of uncertainty in
-        # the model. This is a bit hacky.
-        self._std_weight_position = 1. / 20
-        self._std_weight_velocity = 1. / 160
+        # the model. This is now configurable via site config.
+        # These two parameters are for process noise. For low fps, we want to increase these values to allow for more motion per frame.
+        self._std_weight_position = std_weight_position
+        self._std_weight_velocity = std_weight_velocity
+
 
     def initiate(self, measurement):
         """Create track from unassociated measurement.
