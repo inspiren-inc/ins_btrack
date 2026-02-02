@@ -9,7 +9,7 @@ from yolox.tracker import matching
 from .basetrack import BaseTrack, TrackState
 
 class STrack(BaseTrack):
-    shared_kalman = KalmanFilter()
+    shared_kalman = None
     def __init__(self, tlwh, score, prediction_idx):
 
         # wait activate
@@ -157,7 +157,9 @@ class BYTETracker(object):
         #self.buffer_size = int(frame_rate / 30.0 * args["track_buffer"])
         self.buffer_size = args["track_buffer"]
         self.max_time_lost = self.buffer_size
-        self.kalman_filter = KalmanFilter()
+        self.kalman_filter = KalmanFilter(std_weight_position = args.get("std_weight_position", 1. / 20), std_weight_velocity = args.get("std_weight_velocity", 1. / 160))
+        # Initialize the shared Kalman filter for STrack with the same parameters
+        STrack.shared_kalman = KalmanFilter(std_weight_position = args.get("std_weight_position", 1. / 20), std_weight_velocity = args.get("std_weight_velocity", 1. / 160))
 
     def update(self, output_results):
         self.frame_id += 1
